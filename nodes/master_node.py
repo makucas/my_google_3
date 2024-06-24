@@ -1,9 +1,7 @@
-from load_balancer import LoadBalancer
 import rpyc
 
 class MasterService(rpyc.Service):
     def __init__(self):
-        self.lb = LoadBalancer(3)
         pass
 
     def on_connect(self, conn):
@@ -12,16 +10,12 @@ class MasterService(rpyc.Service):
     def on_disconnect(self, conn):
         pass
 
-    def exposed_insert(self, archive):
-        connections = self.lb.forward_request()
-        print(connections)
+    def exposed_insert(self, archive_name, archive):
+        c = rpyc.connect_by_service("INSERT")
+        c.root.insert(archive_name, archive)
+        
 
-        ip, port = connections["SLAVE1"]
-        c = rpyc.connect(ip, port)
-        result = c.root.insert(archive)
 
-        # c = rpyc.connect(ip, port)
-        # result = c.root.search()
-        # return result
+
 
     

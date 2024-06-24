@@ -3,12 +3,14 @@ import threading
 
 # nodes
 from nodes.master_node import MasterService
+from nodes.insert_node import InsertService
 from nodes.slave_node import SlaveService
 from nodes.slave_node import create_slave
 
-MASTER_PORT = 18812
-DATA_PORT = 18813
-SLAVE_PORT = 18814
+MASTER_PORT = 19811
+INSERT_PORT = 19812
+DATA_PORT = 19813
+SLAVE_PORT = 19814
 
 def start_server(service, port):
     server = ThreadedServer(service, port=port, auto_register=True)
@@ -29,6 +31,9 @@ if __name__ == "__main__":
 
     # Iniciar servidor mestre
     threads.append(start_thread(MasterService, MASTER_PORT))
+
+    # Iniciar o insert node
+    threads.append(start_thread(InsertService(replicator_factor=3), INSERT_PORT))
 
     # Iniciar servidores escravos
     for i, slave in enumerate(slaves, start=1):

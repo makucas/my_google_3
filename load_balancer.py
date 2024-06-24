@@ -15,10 +15,9 @@ class LoadBalancer():
         return node
 
     def forward_request(self):
-        connections = {}
+        connections = []
         # pegando os próximos nós com base no fator de réplica
         for _ in range(self.factor):
             node = self.get_next_node()
-            node_info = rpyc.discover(node)
-            connections[node] = node_info[0]
+            connections.append(node)
         return connections

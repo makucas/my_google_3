@@ -14,7 +14,7 @@ DATA_PORT = 19813
 SLAVE_PORT = 19814
 
 def start_server(service, port):
-    server = ThreadedServer(service, port=port, auto_register=True)
+    server = ThreadedServer(service, port=port, protocol_config={'allow_public_attrs': True}, auto_register=True)
     print("starting...")
     server.start()
 

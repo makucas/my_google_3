@@ -11,7 +11,7 @@ class MasterService(rpyc.Service):
         pass
 
     def exposed_insert(self, archive_name, archive):
-        c = rpyc.connect_by_service("INSERT")
+        c = rpyc.connect_by_service("INSERT", config={'allow_public_attrs': True})
         c.root.insert(archive_name, archive)
         
 

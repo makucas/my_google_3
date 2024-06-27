@@ -1,4 +1,5 @@
 from rpyc.utils.server import ThreadedServer
+import time
 import threading
 
 # nodes
@@ -31,13 +32,15 @@ if __name__ == "__main__":
 
     # Iniciar servidor mestre
     threads.append(start_thread(MasterService, MASTER_PORT))
-
-    # Iniciar o insert node
-    threads.append(start_thread(InsertService(replicator_factor=3), INSERT_PORT))
+    time.sleep(1)
 
     # Iniciar servidores escravos
     for i, slave in enumerate(slaves, start=1):
         threads.append(start_thread(slave, SLAVE_PORT + i))
+    time.sleep(1)
+
+    # Iniciar o insert node
+    threads.append(start_thread(InsertService(replicator_factor=3), INSERT_PORT))
 
     # Aguardar todas as threads terminarem
     for thread in threads:

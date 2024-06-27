@@ -3,10 +3,15 @@ import rpyc
 
 class LoadBalancer():
     def __init__(self, factor):
-        self.nodes = Manager().return_all_nodes()
+        self.nodes = []
         self.factor = factor
         self.index = 0
-    
+
+        self.update_nodes()
+
+    def update_nodes(self):
+        self.nodes = Manager().return_all_nodes()
+
     def get_next_node(self):
         node = self.nodes[self.index]
         self.index = self.index + 1
@@ -15,6 +20,7 @@ class LoadBalancer():
         return node
 
     def forward_request(self):
+        print(self.nodes)
         connections = []
         # pegando os próximos nós com base no fator de réplica
         for _ in range(self.factor):

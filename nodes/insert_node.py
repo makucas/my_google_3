@@ -15,7 +15,7 @@ class InsertService(rpyc.Service):
         # for i in range(len(c)):
         #     c[i].root.insert(archive_name, archive)
 
-        c = rpyc.connect_by_service(connections[0])
+        c = rpyc.connect_by_service(connections[0], config={'allow_public_attrs': True})
         c.root.insert(archive_name, archive)
 
             

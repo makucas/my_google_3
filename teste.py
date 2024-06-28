@@ -1,5 +1,7 @@
 import json
 import os
+import pandas as pd
+import sys
 
 def insert(archive_name, archive):
     file_names = archive_name.split("_")
@@ -16,4 +18,10 @@ if __name__ == "__main__":
     with open('sample_dataset.json', 'r') as file:
         dados = json.load(file)
 
-    insert("arquivo1_chunk0", dados)
+    print(type(dados))
+    print(len(dados))
+    print(pd.DataFrame(dados))
+
+
+
+    #insert("arquivo1_chunk0", dados)

@@ -17,12 +17,12 @@ class ChunkLoader():
         self.total_size = 0
         self.chunk_id += 1
 
-    def send_chunk(self, chunk, id):
+    def send_chunk(self, chunk, id, archive_name):
         print("sending another chunk")
-        chunk_name = f"archive0_chunk{id}"
+        chunk_name = f"{archive_name}_chunk{id}"
         self.connection.root.insert(chunk_name, chunk)
 
-    def load_chunk(self, archive_path):
+    def load_chunk(self, archive_path, archive_name):
         """
             Adiciona cada item do json a chunk, quando o tamanho da chunk em kB superar 
             o tamanho máximo previsto, envia a chunk, reinicia ela e repete o processo 
@@ -33,17 +33,17 @@ class ChunkLoader():
                 item = json.loads(line)
                 item_size = (asizeof.asizeof(item))/(1024) # tamanho em kB
                 if self.total_size + item_size > self.max_size:
-                    self.send_chunk(self.chunk, self.chunk_id)
+                    self.send_chunk(self.chunk, self.chunk_id, archive_name)
                     self.reset_chunk()
-
-                self.chunk.append(item)
-                self.total_size += item_size
+                else:
+                    self.chunk.append(item)
+                    self.total_size += item_size
 
 if __name__ == "__main__":
     c = rpyc.connect_by_service("MASTER", config={'allow_public_attrs': True})
 
     loader = ChunkLoader(connection=c)
-    loader.load_chunk("archives/2016.jsonl")
+    loader.load_chunk(archive_path="archives/2016.jsonl", archive_name="2016")
 
 
 

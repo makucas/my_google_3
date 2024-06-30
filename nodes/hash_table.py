@@ -1,9 +1,15 @@
 import rpyc
 import csv
+import os
 
 class HashTableService(rpyc.Service):
     def __init__(self):
-        self.file_path = 'hash_table.csv'
+        self.file_path = 'data/hash_table.csv'
+
+        if not os.path.exists(self.file_path):
+            with open(self.file_path, 'w') as _:
+                pass
+
         self.hash_table = self.load_hash_table()
 
     def load_hash_table(self):

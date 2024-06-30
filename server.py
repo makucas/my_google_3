@@ -8,7 +8,7 @@ from nodes.master_node import MasterService
 from nodes.insert_node import InsertService
 from nodes.slave_node import SlaveService
 from nodes.slave_node import create_slave
-from hash_table import HashTableService 
+from nodes.hash_table import HashTableService 
 
 MASTER_PORT = 19811
 INSERT_PORT = 19812
@@ -50,7 +50,7 @@ if __name__ == "__main__":
             threads.append(start_thread(slave, SLAVE_PORT + i))
         time.sleep(1)
 
-        threads.append(start_thread(InsertService(replicator_factor=3), INSERT_PORT))
+        threads.append(start_thread(InsertService(replicator_factor=1), INSERT_PORT))
         threads.append(start_thread(HashTableService, HASH_TABLE_PORT))
         while True:
             time.sleep(1)

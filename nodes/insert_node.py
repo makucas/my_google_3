@@ -6,9 +6,12 @@ class InsertService(rpyc.Service):
     def __init__(self, replicator_factor):
         self.lb = LoadBalancer(replicator_factor)
 
-    def insert_to_root(self, root, archive_name, archive, connection):
+    def insert_to_root(self, root, root2, archive_name, archive, connection):
         print(f"INSERT: Sending data to {connection}")
         root.insert(archive_name, archive)
+
+        archive_name = archive_name + f"_{connection}"
+        root2.add_entry(archive_name)
 
     def exposed_insert(self, archive_name, archive):
         """
@@ -18,31 +21,15 @@ class InsertService(rpyc.Service):
         connections = self.lb.forward_request()
 
         threads = []
+        c2 = rpyc.connect_by_service("HASHTABLE")
         for connection in connections:
             c = rpyc.connect_by_service(connection, config={'allow_public_attrs': True})
-            thread = threading.Thread(target=self.insert_to_root, args=(c.root, archive_name, archive, connection))
+            thread = threading.Thread(target=self.insert_to_root, args=(c.root, c2.root, archive_name, archive, connection))
             threads.append(thread)
             thread.start()
 
         for thread in threads:
             thread.join()
-
-        
-        # c = []
-        # for connection in connections:
-        #     c.append(rpyc.connect_by_service(connection))
-
-        # for i in range(len(c)):
-        #     c[i].root.insert(archive_name, archive)
-
-        connection = connections[0]
-
-        c = rpyc.connect_by_service(connection, config={'allow_public_attrs': True})
-        c.root.insert(archive_name, archive)
-
-        c2 = rpyc.connect_by_service("HASHTABLE")
-        archive_name = archive_name + f"_{connection}"
-        c2.root.add_entry(archive_name)
 
             
 

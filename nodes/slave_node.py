@@ -10,16 +10,21 @@ class SlaveService(rpyc.Service):
         pass
 
     def exposed_insert(self, archive_name, archive):
+        # EM CONSTRUÇÃO
         # archive0_chunk0_slave1
 
-        file_names = archive_name.split("_")
-        file_path = f"data/{file_names[0]}/{file_names[1]}.json"
+        print(f"{self.__class__.__name__}: saving {archive_name}")
 
-        if not os.path.exists(f"data/{file_names[0]}"):
-            os.makedirs(f"data/{file_names[0]}")
+        file_names = archive_name.split("_")
+        file_path = f"{self.__class__.__name__}/{file_names[0]}/{file_names[1]}.json"
+
+        if not os.path.exists(f"{self.__class__.__name__}/{file_names[0]}"):
+            os.makedirs(f"{self.__class__.__name__}/{file_names[0]}")
 
         with open(file_path, "w") as f:
             json.dump(archive, f)
+
+        print("SLAVE: finished")
         
 def create_slave(name):
     return type(name, (SlaveService,), {})

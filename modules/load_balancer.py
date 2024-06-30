@@ -1,4 +1,4 @@
-from cluster_manager import Manager
+from modules.cluster_manager import Manager
 import rpyc
 
 class LoadBalancer():
@@ -20,7 +20,6 @@ class LoadBalancer():
         return node
 
     def forward_request(self):
-        print(self.nodes)
         connections = []
         # pegando os próximos nós com base no fator de réplica
         for _ in range(self.factor):

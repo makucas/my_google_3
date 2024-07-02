@@ -12,13 +12,13 @@ class SlaveService(rpyc.Service):
         print(f"data: saving {archive_name}")
 
         file_names = archive_name.split("_")
-        file_path = f"data/{file_names[0]}/{file_names[1]}.json"
+        file_path = f"data/{file_names[0]}/{file_names[1]}.txt"
 
         if not os.path.exists(f"data/{file_names[0]}"):
             os.makedirs(f"data/{file_names[0]}")
 
-        with open(file_path, "w") as f:
-            json.dump(archive, f)
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(str(archive))
 
         print("SLAVE: finished")
         

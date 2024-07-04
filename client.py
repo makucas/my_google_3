@@ -3,22 +3,27 @@ import json
 import pandas as pd
 import sys
 from pympler import asizeof
+import os
 class ChunkLoader():
-    def __init__(self, connection, max_size=1*1024):
+    def __init__(self, connection, max_size=10*1024):
         self.connection = connection
 
         self.chunk = []
         self.max_size = max_size
-        self.total_size = 0
+        self.chunk_size = 0
         self.chunk_id = 1
+
+        self.chunk_total_size = 0
+        self.archive_total_size = 0
 
     def reset_chunk(self):
         self.chunk = []
-        self.total_size = 0
+        self.chunk_total_size += self.chunk_size
+        self.chunk_size = 0
         self.chunk_id += 1
 
     def send_chunk(self, chunk, id, archive_name):
-        print("sending another chunk")
+        print(f"Sending chunk{id} - {int((100*self.chunk_total_size)/self.archive_total_size)}%")
         chunk_name = f"{archive_name}_chunk{id}"
         self.connection.root.insert(chunk_name, chunk)
 
@@ -28,22 +33,28 @@ class ChunkLoader():
             o tamanho máximo previsto, envia a chunk, reinicia ela e repete o processo 
             enquanto existir itens no json.
         """
-        with open(archive_path, 'r') as jsonl_file:
-            for line in jsonl_file:
-                item = json.loads(line)
-                item_size = (asizeof.asizeof(item))/(1024) # tamanho em kB
-                if self.total_size + item_size > self.max_size:
+        self.archive_total_size = (os.path.getsize(archive_path))/(1024) # tamanho em kB
+
+        with open(archive_path, 'r') as f:
+            while True:
+                item = f.readline()
+                if not item:
+                    self.send_chunk(self.chunk, self.chunk_id, archive_name)
+                    break
+
+                item_size = (asizeof.asizeof(item)/(1024)) # tamanho em kB
+                if self.chunk_size + item_size > self.max_size:
                     self.send_chunk(self.chunk, self.chunk_id, archive_name)
                     self.reset_chunk()
                 else:
                     self.chunk.append(item)
-                    self.total_size += item_size
+                    self.chunk_size += item_size
 
 if __name__ == "__main__":
     c = rpyc.connect_by_service("MASTER", config={'allow_public_attrs': True})
 
     loader = ChunkLoader(connection=c)
-    loader.load_chunk(archive_path="archives/2016.jsonl", archive_name="2016")
+    loader.load_chunk(archive_path="archives/2016_copy.txt", archive_name="2016")
 
 
 

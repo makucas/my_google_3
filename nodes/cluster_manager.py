@@ -57,13 +57,13 @@ if __name__ == "__main__":
 
     try:
         server = ThreadedServer(ClusterManagerService(), port=19901, protocol_config={'allow_public_attrs': True}, auto_register=True)
-        print("Strating Cluster Manager")
+        print("Starting Cluster Manager")
         server.start()
 
     except KeyboardInterrupt:
         stop_server(None, None)
 
     except Exception as e:
-        print(f"Error when strating Cluster Manager: {e}")
+        print(f"Error when starting Cluster Manager: {e}")
 
 

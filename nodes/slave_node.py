@@ -1,3 +1,4 @@
+import ast
 import rpyc
 import json
 import os
@@ -39,6 +40,18 @@ class SlaveService(rpyc.Service):
                 print(f"Failed to notify cluster manager: {e}")
             
             time.sleep(self.notification_interval)
+    
+    def exposed_search(self, archive, chunk, query):
+        results = []
+        with open(f"data/{archive}/{chunk}.txt", "r", encoding="utf-8") as f:
+            archive_content = f.read()
+
+            data = ast.literal_eval(archive_content)
+
+            for item in data:
+                if item["maintext"] and query.lower() in item.get('maintext').lower():
+                    results.append(item["title"])       
+        return results
         
 def create_slave(name):
     return type(name, (SlaveService,), {})

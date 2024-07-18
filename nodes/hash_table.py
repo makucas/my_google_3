@@ -27,11 +27,12 @@ class HashTableService(rpyc.Service):
         return hash_table
 
     def exposed_get_chunk_location(self, archive, chunk):
+        chunk_machines = []
         if archive in self.hash_table:
             for entry in self.hash_table[archive]:
                 if entry['chunk'] == chunk:
-                    return entry['machine']
-        return None
+                    chunk_machines.append(entry['machine'])
+        return chunk_machines
 
     def exposed_add_entry(self, archive_name):
         archive, chunk, machine = archive_name.split('_')
@@ -46,3 +47,24 @@ class HashTableService(rpyc.Service):
             for archive, entries in self.hash_table.items():
                 for entry in entries:
                     writer.writerow([archive, entry['chunk'], entry['machine']])
+    
+    def exposed_get_all_chunks(self):
+        """
+        Obtem todos os chunks de todos os arquivos no hash table
+        """
+        def extract_number(chunk):
+            return int(chunk[5:])
+        
+        self.hash_table = self.load_hash_table()
+
+        unique_chunks = {}
+
+        for archive, data_list in self.hash_table.items():
+            unique_chunks[archive] = []
+            for item in data_list:
+                unique_chunks[archive].append(item["chunk"])
+        
+        for archive in unique_chunks:
+            unique_chunks[archive] = sorted(list(set(unique_chunks[archive])), key=extract_number)
+
+        return unique_chunks

@@ -56,5 +56,6 @@ if __name__ == "__main__":
     loader = ChunkLoader(connection=c)
     loader.load_chunk(archive_path="archives/2016_copy.txt", archive_name="2016")
 
-
+    search_results = c.root.search("pode resultar")
+    print(search_results)
 

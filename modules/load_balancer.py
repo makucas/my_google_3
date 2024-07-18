@@ -1,4 +1,3 @@
-from modules.cluster_manager import Manager
 import rpyc
 
 class LoadBalancer():
@@ -7,10 +6,13 @@ class LoadBalancer():
         self.factor = factor
         self.index = 0
 
+        self.conn = rpyc.connect_by_service("CLUSTERMANAGER", config={'allow_public_attrs': True})
+
         self.update_nodes()
 
     def update_nodes(self):
-        self.nodes = Manager().return_all_nodes()
+        self.nodes = self.conn.root.get_nodes()
+        #self.nodes = Manager().return_all_nodes()
 
     def get_next_node(self):
         node = self.nodes[self.index]

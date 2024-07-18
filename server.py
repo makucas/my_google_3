@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
         # Iniciar servidores escravos
         for i, slave in enumerate(slaves, start=1):
-            threads.append(start_thread(slave, SLAVE_PORT + i))
+            threads.append(start_thread(slave(), SLAVE_PORT + i))
         time.sleep(1)
 
         threads.append(start_thread(InsertService(replicator_factor=1), INSERT_PORT))

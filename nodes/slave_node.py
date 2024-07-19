@@ -28,18 +28,6 @@ class SlaveService(rpyc.Service):
             f.write(str(archive))
 
         print("SLAVE: finished")
-
-    def notify_cluster_manager(self):
-        while self.alive:
-            try:
-                conn = rpyc.connect_by_service("CLUSTERMANAGER", config={'allow_public_attrs': True})
-                conn.root.notify_alive(self.__class__.__name__)
-                conn.close()
-                print(f"Notification sent to cluster manager")
-            except Exception as e:
-                print(f"Failed to notify cluster manager: {e}")
-            
-            time.sleep(self.notification_interval)
     
     def exposed_search(self, archive, chunk, query):
         results = []
@@ -52,6 +40,18 @@ class SlaveService(rpyc.Service):
                 if item["maintext"] and query.lower() in item.get('maintext').lower():
                     results.append(item["title"])       
         return results
+    
+    def notify_cluster_manager(self):
+        while self.alive:
+            try:
+                conn = rpyc.connect_by_service("CLUSTERMANAGER", config={'allow_public_attrs': True})
+                conn.root.notify_alive(self.__class__.__name__)
+                conn.close()
+                print(f"Notification sent to cluster manager")
+            except Exception as e:
+                print(f"Failed to notify cluster manager: {e}")
+            
+            time.sleep(self.notification_interval)
         
 def create_slave(name):
     return type(name, (SlaveService,), {})

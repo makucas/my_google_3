@@ -52,7 +52,7 @@ if __name__ == "__main__":
             threads.append(start_thread(slave(), SLAVE_PORT + i))
         time.sleep(1)
 
-        threads.append(start_thread(InsertService(replicator_factor=1), INSERT_PORT))
+        threads.append(start_thread(InsertService(), INSERT_PORT))
         threads.append(start_thread(SearchService, SEARCH_PORT))
         threads.append(start_thread(HashTableService, HASH_TABLE_PORT))
         while True:

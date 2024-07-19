@@ -3,8 +3,9 @@ import threading
 import rpyc
 
 class InsertService(rpyc.Service):
-    def __init__(self, replicator_factor):
-        self.lb = LoadBalancer(replicator_factor)
+    def __init__(self):
+        self.lb = rpyc.connect_by_service("INSERTLOADBALANCER", config={'allow_public_attrs': True})
+        #self.lb = LoadBalancer(replicator_factor)
 
     def insert_to_root(self, root, root2, archive_name, archive, connection):
         print(f"INSERT: Sending data to {connection}")
@@ -18,7 +19,7 @@ class InsertService(rpyc.Service):
             Pega as conexões com o load balancer e envia os arquivos para inserção
             simultâneamente utilizando threads.
         """
-        connections = self.lb.forward_request()
+        connections = self.lb.root.forward_request()
 
         threads = []
         c2 = rpyc.connect_by_service("HASHTABLE")

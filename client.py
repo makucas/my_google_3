@@ -47,7 +47,7 @@ class ChunkLoader():
                     self.send_chunk(self.chunk, self.chunk_id, archive_name)
                     self.reset_chunk()
                 else:
-                    self.chunk.append(item)
+                    self.chunk.append(json.loads(item))
                     self.chunk_size += item_size
 
 if __name__ == "__main__":

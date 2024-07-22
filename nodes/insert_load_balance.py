@@ -20,8 +20,8 @@ class InsertLoadBalancerService(rpyc.Service):
         """
             Atualiza a lista de nós com base no cluster manager.
         """
-        print(f"Updating nodes: {self.nodes}")
         self.nodes = self.conn.root.get_nodes()
+        print(f"Updating nodes: {self.nodes}")
 
     def get_next_node(self):
         """

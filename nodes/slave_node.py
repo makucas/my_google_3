@@ -3,13 +3,18 @@ import rpyc
 import json
 import os
 import threading
+import signal
+import rpyc
+import time, sys
+import threading
+from rpyc.utils.server import ThreadedServer
 import time
 #from services.search import Searcher
 
 class SlaveService(rpyc.Service):
     def __init__(self):
         self.alive = True
-        self.notification_interval = 50
+        self.notification_interval = 5
         threading.Thread(target=self.notify_cluster_manager, daemon=True).start()
 
         if not os.path.exists("data"):
@@ -56,3 +61,35 @@ class SlaveService(rpyc.Service):
 def create_slave(name):
     return type(name, (SlaveService,), {})
 
+def stop_server(signal, frame):
+    print("Shutting down...")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    timestamp = time.time()
+    slave_name = f"Slave{timestamp}Service"
+    slave_port = 19816
+
+    signal.signal(signal.SIGINT, stop_server)
+    signal.signal(signal.SIGTERM, stop_server)
+
+    slave = create_slave(slave_name) 
+    
+    for i in range(200):
+        try:
+            server = ThreadedServer(slave(), port=slave_port, protocol_config={'allow_public_attrs': True}, auto_register=True)
+            print(f"Starting Slave {slave_name} in port {slave_port}")
+            server.start()
+            break
+
+        except KeyboardInterrupt:
+            stop_server(None, None)
+            break
+
+        except Exception as e:
+            if "Address already in use" in str(e):
+                slave_port+=1
+                continue
+            else:
+                print(f"Error when starting Slave: {e}")
+                break

@@ -11,7 +11,7 @@ def stop_server(signal, frame):
     sys.exit(0)
 
 class ClusterManagerService(rpyc.Service):
-    def __init__(self, timeout=60):
+    def __init__(self, timeout=4):
         self.timeout = timeout
         self.nodes = {}
 
@@ -49,13 +49,16 @@ class ClusterManagerService(rpyc.Service):
         if notify:
             self.update_load_balancer()
 
-
     def exposed_get_nodes(self):
         """
             Retorna todos os nós ativos do Cluster.
         """
-        with self.lock:
-            node_names = [node.replace("Service", "") for node in self.nodes.keys()]
+        try:
+            with self.lock:
+                node_names = [node.replace("Service", "") for node in self.nodes.keys()]
+        except Exception as e:
+            print(f"ERROR: Na função exposed_get_nodes -- {e}")
+
         return node_names
 
     def check_inactive_nodes(self):
@@ -67,8 +70,9 @@ class ClusterManagerService(rpyc.Service):
             do load balancer.
         """
         while True:
-            time.sleep(5)  # Check every 5 seconds
+            time.sleep(2)  # Check every 5 seconds
             current_time = time.time()
+            update = False
 
             print(f"current time: {current_time}")
             print(f"self nodes: {self.nodes}")
@@ -81,8 +85,11 @@ class ClusterManagerService(rpyc.Service):
                     for node in inactive_nodes:
                         del self.nodes[node]
                         print(f"Node {node} has been removed due to inactivity.")
-                    print(f"Updating load balancer")
-                    self.update_load_balancer()
+                    update = True # set the update flag
+            if update:
+                print(f"Updating load balancer")
+                self.update_load_balancer()
+                update = False
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, stop_server)

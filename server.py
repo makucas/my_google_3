@@ -38,8 +38,8 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, stop_server)
 
     try:
-        slave_services = ["Slave1Service", "Slave2Service", "Slave3Service"]
-        slaves = [create_slave(service) for service in slave_services]
+        # slave_services = ["Slave1Service", "Slave2Service", "Slave3Service"]
+        # slaves = [create_slave(service) for service in slave_services]
 
         threads = []
 
@@ -48,9 +48,9 @@ if __name__ == "__main__":
         time.sleep(1)
 
         # Iniciar servidores escravos
-        for i, slave in enumerate(slaves, start=1):
-            threads.append(start_thread(slave(), SLAVE_PORT + i))
-        time.sleep(1)
+        # for i, slave in enumerate(slaves, start=1):
+        #     threads.append(start_thread(slave(), SLAVE_PORT + i))
+        # time.sleep(1)
 
         threads.append(start_thread(InsertService(), INSERT_PORT))
         threads.append(start_thread(SearchService, SEARCH_PORT))

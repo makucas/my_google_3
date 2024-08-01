@@ -33,11 +33,13 @@ class InsertLoadBalancerService(rpyc.Service):
             self.index = 0
         return node
 
-    def exposed_forward_request(self):
+    def exposed_forward_request(self, replicator_factor = None):
         """
             Retorna as conexões contendo os nós de inserção com base
             no fator de réplica.
         """
+        if replicator_factor:
+            self.replicator_factor = replicator_factor
         connections = []
         for _ in range(self.replicator_factor):
             node = self.get_next_node()

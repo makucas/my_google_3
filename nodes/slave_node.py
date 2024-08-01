@@ -67,8 +67,8 @@ def stop_server(signal, frame):
     sys.exit(0)
 
 if __name__ == "__main__":
-    timestamp = time.time()
-    slave_name = f"Slave{timestamp}Service"
+    name= "1"
+    slave_name = f"Slave{name}Service"
     slave_port = 19817
 
     signal.signal(signal.SIGINT, stop_server)

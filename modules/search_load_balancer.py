@@ -29,3 +29,13 @@ class SearchLoadBalancer():
                     print(f"No avaiable machines for chunk {chunk} of archive {archive}")
         
         return machine_per_chunk
+    
+    def get_next_node_machine(self, archive, chunk, first_machine):
+        nodes = [i.lower() for i in self.nodes]
+        machines = self.hash_table.root.get_chunk_location(archive, chunk)
+
+        for machine in machines:
+            if machine.lower() in nodes and machine != first_machine:
+                return machine
+        
+        return None

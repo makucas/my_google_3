@@ -4,6 +4,9 @@ import pandas as pd
 import sys
 from pympler import asizeof
 import os
+import time
+import csv
+
 class ChunkLoader():
     def __init__(self, connection, max_size=10*1024):
         self.connection = connection
@@ -51,11 +54,25 @@ class ChunkLoader():
                     self.chunk_size += item_size
 
 if __name__ == "__main__":
+    execution_times = {}
+
     c = rpyc.connect_by_service("MASTER", config={'allow_public_attrs': True})
 
     loader = ChunkLoader(connection=c)
+    start_time = time.time()
     loader.load_chunk(archive_path="archives/2016_copy.txt", archive_name="2016")
+    end_time = time.time()
+    execution_times["insert"] = end_time - start_time
 
-    #search_results = c.root.search("pode resultar")
+    start_time = time.time()
+    search_results = c.root.search("pode resultar")
+    end_time = time.time()
+    execution_times["search"] = end_time - start_time
     #print(search_results)
 
+    # Salvar valores em um arquivo CSV
+    with open('4_nodes.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Function Name", "Execution Time"])
+        for key, value in execution_times.items():
+            writer.writerow([key, value])

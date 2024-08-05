@@ -21,7 +21,7 @@ class SearchService(rpyc.Service):
         for archive in chunk_connection:
             for chunk, connection in chunk_connection[archive].items():
                 try:
-                    c = rpyc.connect_by_service(connection, config={'allow_public_attrs': True})
+                    c = rpyc.connect_by_service(connection, config={'allow_public_attrs': True, 'sync_request_timeout': None})
                 except Exception as e:
                     print(f"SEARCH NODE: {e}")
                     errors.append([archive, chunk, connection])

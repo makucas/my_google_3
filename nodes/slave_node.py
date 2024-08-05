@@ -50,7 +50,7 @@ class SlaveService(rpyc.Service):
     def notify_cluster_manager(self):
         while self.alive:
             try:
-                conn = rpyc.connect_by_service("CLUSTERMANAGER", config={'allow_public_attrs': True})
+                conn = rpyc.connect_by_service("CLUSTERMANAGER", config={'allow_public_attrs': True, 'sync_request_timeout': None})
                 conn.root.notify_alive(self.__class__.__name__)
                 conn.close()
                 print(f"Notification sent to cluster manager")

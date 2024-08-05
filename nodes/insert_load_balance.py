@@ -13,7 +13,7 @@ class InsertLoadBalancerService(rpyc.Service):
         self.replicator_factor = replicator_factor
         self.index = 0
 
-        self.conn = rpyc.connect_by_service("CLUSTERMANAGER", config={'allow_public_attrs': True})
+        self.conn = rpyc.connect_by_service("CLUSTERMANAGER", config={'allow_public_attrs': True, 'sync_request_timeout': None})
         self.exposed_update_nodes()
 
     def exposed_update_nodes(self):

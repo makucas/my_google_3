@@ -4,7 +4,7 @@ import rpyc
 
 class InsertService(rpyc.Service):
     def __init__(self):
-        self.lb = rpyc.connect_by_service("INSERTLOADBALANCER", config={'allow_public_attrs': True})
+        self.lb = rpyc.connect_by_service("INSERTLOADBALANCER", config={'allow_public_attrs': True, 'sync_request_timeout': None})
         #self.lb = LoadBalancer(replicator_factor)
 
     def insert_to_root(self, root, root2, archive_name, archive, connection):
@@ -19,7 +19,7 @@ class InsertService(rpyc.Service):
         c2 = rpyc.connect_by_service("HASHTABLE")
         for connection in connections:
             try:
-                c = rpyc.connect_by_service(connection, config={'allow_public_attrs': True})
+                c = rpyc.connect_by_service(connection, config={'allow_public_attrs': True, 'sync_request_timeout': None})
             except Exception as e:
                 print(f"INSERT NODE: {e}")
                 errors.append(connection)
